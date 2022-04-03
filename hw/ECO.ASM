@@ -1,0 +1,59 @@
+; Programa echo
+TITLE PRO_I
+
+Fin_Men 	equ  	'$'
+CR      	equ  	13
+LF      	equ  	10
+Nueve   	equ  	9
+Seis    	equ  	6
+
+STACK_SEGMENT SEGMENT "STACK"
+	DW 100 DUP(?)
+	TOPE_PILA	EQU	THIS WORD
+	STACK_SEGMENT ENDS
+DATA_SEGMENT SEGMENT "DATA"
+	MEN	DB	CR
+		DB	5 DUP(0AH)
+		DB	"Nombre y matricula"
+		DB	CR
+		DB	LF
+		DB 	FIN_MEN
+DATA_SEGMENT ENDS
+
+CODE_SEGMENT SEGMENT "CODE"
+	ASSUME CS:CODE_SEGMENT,DS:DATA_SEGMENT,SS:STACK_SEGMENT
+		MAIN PROC FAR
+		; Define el stack pointer
+		MOV SP, OFFSET TOPE_PILA
+
+		; Habilida el data segment
+		MOV AX, DATA_SEGMENT
+		MOV DS, AX
+
+		; Habilita el stack segment
+		MOV AX, STACK_SEGMENT
+		MOV SS, AX
+
+		; Imprime mensaje
+		MOV DX, OFFSET MEN
+		MOV AH, Nueve
+		INT 21H
+
+		INICIA:
+			MOV AH, Seis
+			MOV DL, 0FFH
+			INT 21H
+			JE INICIA
+			CMP AL, 2AH
+			JE FINAL
+			MOV AH, Seis
+			MOV DL, AL
+			INT 21H
+			JMP INICIA
+		FINAL:
+			MOV AH, 4CH
+			INT 21H
+	MAIN ENDP
+CODE_SEGMENT ENDS
+
+END MAIN
